@@ -70,3 +70,87 @@ select sp_get_expensive_movie2();
 
 
 -- create sp_get_movies_stat -- return max price, min price, avg price, number of movies
+
+---------------------------------------
+-- create sp_get_movies_stat -- return max price, min price, avg price, number of movies
+
+drop function sp_movies_stat();
+
+CREATE or replace function sp_movies_stat(
+    OUT min_price double precision,
+    OUT max_price double precision,
+    OUT avg_price double precision,
+    out count_movies INTEGER)
+language plpgsql AS
+    $$
+        BEGIN
+            select min(price), max(price), avg(price)::numeric(5,2), count(*)
+            into min_price, max_price, avg_price, count_movies
+            from movies;
+        end;
+    $$;
+select * from sp_movies_stat();
+
+---------------------------------------
+-- 1- select * from movies
+
+drop function sp_get_all_movies();
+
+CREATE or replace function sp_get_all_movies()
+returns TABLE(id bigint,
+            title TEXT,
+            release_date TIMESTAMP,
+            price DOUBLE PRECISION,
+            country_id bigint)
+language plpgsql AS
+    $$
+        BEGIN
+			return QUERY
+            select * from movies;
+        end;
+    $$;
+select * from sp_get_all_movies();
+
+---------------------------------------
+-- 2- select * from movies join countries
+
+drop function sp_get_all_movies_country_name();
+
+CREATE or replace function sp_get_all_movies_country_name()
+returns TABLE(id bigint,
+            title TEXT,
+            release_date TIMESTAMP,
+            price DOUBLE PRECISION,
+            country_name TEXT)
+language plpgsql AS
+    $$
+        BEGIN
+			return QUERY
+            select m.id, m.title, m.release_date, m.price, c.name as country_name from movies m
+            join countries c on m.country_id  = c.id;
+        end;
+    $$;
+select * from sp_get_all_movies_country_name();
+
+---------------------------------------
+-- 3- select * from movies join countreis price range
+
+drop function sp_get_all_movies_country_name_range();
+
+CREATE or replace function sp_get_all_movies_country_name_range(_min double precision,
+							_max double precision)
+returns TABLE(id bigint,
+            title TEXT,
+            release_date TIMESTAMP,
+            price DOUBLE PRECISION,
+            country_name TEXT)
+language plpgsql AS
+    $$
+        BEGIN
+			return QUERY
+            select m.id, m.title, m.release_date, m.price, c.name as country_name from movies m
+            join countries c on m.country_id  = c.id
+			where m.price between _min and _max;
+        end;
+    $$;
+select * from sp_get_all_movies_country_name_range(40, 130);

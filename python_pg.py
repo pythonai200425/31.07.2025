@@ -48,7 +48,20 @@ try:
     cur.execute("SELECT * FROM users")
     rows = cur.fetchall()
     for row in rows:
-        print(row)
+        print(dict(row))
+except psycopg2.Error as e:
+    print("Select error:", e)
+finally:
+    cur.close()
+
+################ stored procedure
+print("\nMovies:")
+try:
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM sp_get_all_movies()")
+    rows = cur.fetchall()
+    for row in rows:
+        print(dict(row))
 except psycopg2.Error as e:
     print("Select error:", e)
 finally:
