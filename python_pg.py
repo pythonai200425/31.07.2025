@@ -53,3 +53,6 @@ except psycopg2.Error as e:
     print("Select error:", e)
 finally:
     cur.close()
+
+# conn.close()
+print("Connection closed.")
