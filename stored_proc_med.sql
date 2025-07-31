@@ -37,3 +37,36 @@ END;
 $$;
 
 call prepare_db_movies();
+
+-------------------------------------------
+drop function sp_get_expensive_movie();
+
+CREATE OR REPLACE FUNCTION sp_get_expensive_movie() returns double precision
+LANGUAGE plpgsql AS
+$$
+DECLARE
+  max_price double precision;
+BEGIN
+	select max(price) INTO max_price
+	from movies;
+	return max_price;
+END;
+$$;
+
+select sp_get_expensive_movie();
+---------------------------------------
+drop function sp_get_expensive_movie2();
+
+CREATE OR REPLACE FUNCTION sp_get_expensive_movie2(out max_price double precision)
+LANGUAGE plpgsql AS
+$$
+BEGIN
+	select max(price) INTO max_price
+	from movies;
+END;
+$$;
+
+select sp_get_expensive_movie2();
+
+
+-- create sp_get_movies_stat -- return max price, min price, avg price, number of movies
